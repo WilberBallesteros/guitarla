@@ -10,11 +10,16 @@ function App() {
     const [data, setData] = useState(db)
     const [cart, setCart] = useState([])
 
+    const MAX_ITEMS = 5
+    const MIN_ITEMS = 1
+
+    //AGREGAR GUITARRAS AL CARRTO
     function addToCart(item) {
 
         //retorna la posicion del indice en el arreglo si no -1
         const itemExists = cart.findIndex(guitar => guitar.id === item.id)
         if(itemExists >= 0) { //existe en el carrito
+            if(cart[itemExists].quantity >= MAX_ITEMS) return //para q no se pase de la cantidad maxima al darle click en agregar al carrito
             const updateCart = [...cart]
             updateCart[itemExists].quantity++ //se actualiza para q si le doy agregar guitarra agregue mas
             setCart(updateCart)
@@ -24,6 +29,45 @@ function App() {
         }
     }
 
+    //ELIMINAR UNA O MAS GUITARRAS DEL CARRITO
+    //si usa un parametro en el html se usa un callback
+    function removeFromCart(id) {
+         setCart(prevCart => prevCart.filter(guitar =>guitar.id !== id)) //elimino la q le di x y dejo las otras
+    }
+
+    //INCREMENTAR CANTIDADES
+    function increaseQuantity(id) {
+        const updateCart = cart.map(item => {
+            if(item.id === id && item.quantity < MAX_ITEMS) { //identificamos el elementodonde estamos dando click
+                return {
+                    ...item, //ekl resto de la guitarra la traigo igual
+                    quantity: item.quantity + 1 //la cantidad la modifico, la incrementamos
+                }
+            }   
+            return item //el resto los mantenemos intactos, los de la sotras guitarras
+        })
+        setCart(updateCart)
+    }
+
+    //DECREMENTAR CANTIDADES
+    function decraseQuantity(id) {
+        const updateCart = cart.map(item => {
+            if(item.id === id && item.quantity > MIN_ITEMS) { 
+                return {
+                    ...item, 
+                    quantity: item.quantity - 1 
+                }
+            }   
+            return item //
+        })
+        setCart(updateCart)
+    }
+
+    //LIMPIAR CARRITO AL DARLE CLCK AL BOTON LIMPIAR CARRITO :)
+    function clearCart() {
+        setCart([])
+    }
+
   return (
     <>
 
@@ -31,6 +75,10 @@ function App() {
 }
     <Header 
     cart={cart}
+    removeFromCart={removeFromCart}
+    increaseQuantity={increaseQuantity}
+    decraseQuantity={decraseQuantity}
+    clearCart={clearCart}
     /> 
     
     
